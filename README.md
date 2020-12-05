@@ -51,7 +51,10 @@ on the parent directory. This will build the artifact and run tests against the 
 
 ## Dependencies
 
-GWT Storage does not depend on any other module.??????????
+GWT Storage depends on:
+
+* gwt-core
+* get-event
 
 
 ## Roadmap
