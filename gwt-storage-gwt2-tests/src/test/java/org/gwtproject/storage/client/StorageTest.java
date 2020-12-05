@@ -49,11 +49,11 @@ public abstract class StorageTest extends GWTTestCase {
 
     // setup for tests by removing event handler
     if (handler != null) {
-      storage.removeStorageEventHandler(handler);
+      Storage.removeStorageEventHandler(handler);
       handler = null;
     }
     if (handler2 != null) {
-      storage.removeStorageEventHandler(handler2);
+      Storage.removeStorageEventHandler(handler2);
       handler2 = null;
     }
 
@@ -62,18 +62,18 @@ public abstract class StorageTest extends GWTTestCase {
   }
 
   @Override
-  protected void gwtTearDown() throws Exception {
+  protected void gwtTearDown() {
     if (storage == null) {
       return; // do not run if not supported
     }
 
     // clean up by removing event handler
     if (handler != null) {
-      storage.removeStorageEventHandler(handler);
+      Storage.removeStorageEventHandler(handler);
       handler = null;
     }
     if (handler2 != null) {
-      storage.removeStorageEventHandler(handler2);
+      Storage.removeStorageEventHandler(handler2);
       handler2 = null;
     }
 
@@ -137,7 +137,7 @@ public abstract class StorageTest extends GWTTestCase {
       return; // do not run if not supported
     }
 
-    assertEquals(null, storage.getItem("foo"));
+    assertNull(storage.getItem("foo"));
     assertEquals(0, storage.getLength());
     storage.setItem("foo", "bar1");
     assertEquals("bar1", storage.getItem("foo"));
@@ -163,9 +163,9 @@ public abstract class StorageTest extends GWTTestCase {
     }
 
     // key(n) where n >= storage.length() should return null
-    assertEquals(null, storage.key(0));
+    assertNull(storage.key(0));
     storage.setItem("a", "b");
-    assertEquals(null, storage.key(1));
+    assertNull(storage.key(1));
     storage.clear();
 
     storage.setItem("foo1", "bar");
@@ -196,10 +196,10 @@ public abstract class StorageTest extends GWTTestCase {
 
     // removing a key should remove that key and value
     storage.removeItem("foo1");
-    assertEquals(null, storage.getItem("foo1"));
+    assertNull(storage.getItem("foo1"));
     assertEquals("bar2", storage.getItem("foo2"));
     storage.removeItem("foo2");
-    assertEquals(null, storage.getItem("foo2"));
+    assertNull(storage.getItem("foo2"));
   }
 
   public void testClearStorageEvent() {
@@ -210,19 +210,16 @@ public abstract class StorageTest extends GWTTestCase {
     delayTestFinish(2000);
     storage.setItem("tcseFoo", "tcseBar");
     handler =
-        new StorageEvent.Handler() {
-          @Override
-          public void onStorageChange(StorageEvent event) {
-            assertNull(event.getKey());
-            assertNull(event.getOldValue());
-            assertNull(event.getNewValue());
-            assertEquals(storage, event.getStorageArea());
-            assertNotNull(event.getUrl());
+        event -> {
+          assertNull(event.getKey());
+          assertNull(event.getOldValue());
+          assertNull(event.getNewValue());
+          assertEquals(storage, event.getStorageArea());
+          assertNotNull(event.getUrl());
 
-            finishTest();
-          }
+          finishTest();
         };
-    storage.addStorageEventHandler(handler);
+    Storage.addStorageEventHandler(handler);
     storage.clear();
   }
 
@@ -235,19 +232,16 @@ public abstract class StorageTest extends GWTTestCase {
     storage.setItem("tsiseFoo", "tsiseBarOld");
 
     handler =
-        new StorageEvent.Handler() {
-          @Override
-          public void onStorageChange(StorageEvent event) {
-            assertEquals("tsiseFoo", event.getKey());
-            assertEquals("tsiseBarNew", event.getNewValue());
-            assertEquals("tsiseBarOld", event.getOldValue());
-            assertEquals(storage, event.getStorageArea());
-            assertNotNull(event.getUrl());
+        event -> {
+          assertEquals("tsiseFoo", event.getKey());
+          assertEquals("tsiseBarNew", event.getNewValue());
+          assertEquals("tsiseBarOld", event.getOldValue());
+          assertEquals(storage, event.getStorageArea());
+          assertNotNull(event.getUrl());
 
-            finishTest();
-          }
+          finishTest();
         };
-    storage.addStorageEventHandler(handler);
+    Storage.addStorageEventHandler(handler);
     storage.setItem("tsiseFoo", "tsiseBarNew");
   }
 
@@ -260,14 +254,11 @@ public abstract class StorageTest extends GWTTestCase {
     storage.setItem("triseFoo", "triseBarOld");
 
     handler =
-        new StorageEvent.Handler() {
-          @Override
-          public void onStorageChange(StorageEvent event) {
-            assertEquals("triseFoo", event.getKey());
-            finishTest();
-          }
+        event -> {
+          assertEquals("triseFoo", event.getKey());
+          finishTest();
         };
-    storage.addStorageEventHandler(handler);
+    Storage.addStorageEventHandler(handler);
     storage.removeItem("triseFoo");
   }
 
@@ -277,20 +268,16 @@ public abstract class StorageTest extends GWTTestCase {
     }
 
     final boolean[] eventFired = new boolean[1];
-    eventFired[0] = false;
 
     delayTestFinish(3000);
 
     handler =
-        new StorageEvent.Handler() {
-          @Override
-          public void onStorageChange(StorageEvent event) {
-            fail("Storage change should not have fired.");
-            eventFired[0] = true;
-            finishTest();
-          }
+        event -> {
+          fail("Storage change should not have fired.");
+          eventFired[0] = true;
+          finishTest();
         };
-    HandlerRegistration registration = storage.addStorageEventHandler(handler);
+    HandlerRegistration registration = Storage.addStorageEventHandler(handler);
     registration.removeHandler();
 
     // these should fire events, but they should not be caught by handler
@@ -317,22 +304,19 @@ public abstract class StorageTest extends GWTTestCase {
     storage.setItem("teieFoo", "teieBar");
 
     handler =
-        new StorageEvent.Handler() {
-          @Override
-          public void onStorageChange(StorageEvent event) {
-            if ("teieFoo".equals(event.getKey())) {
-              storage.clear();
-              storage.setItem("teieFoo2", "teieBar2");
-              // firing events from within a handler should not corrupt the values.
-              assertEquals("teieFoo", event.getKey());
-              storage.setItem("teieFooEndTest", "thanks");
-            }
-            if ("teieFooEndTest".equals(event.getKey())) {
-              finishTest();
-            }
+        event -> {
+          if ("teieFoo".equals(event.getKey())) {
+            storage.clear();
+            storage.setItem("teieFoo2", "teieBar2");
+            // firing events from within a handler should not corrupt the values.
+            assertEquals("teieFoo", event.getKey());
+            storage.setItem("teieFooEndTest", "thanks");
+          }
+          if ("teieFooEndTest".equals(event.getKey())) {
+            finishTest();
           }
         };
-    storage.addStorageEventHandler(handler);
+    Storage.addStorageEventHandler(handler);
     storage.removeItem("teieFoo");
   }
 
@@ -348,32 +332,26 @@ public abstract class StorageTest extends GWTTestCase {
     storage.setItem("tmehFoo", "tmehBar");
 
     handler =
-        new StorageEvent.Handler() {
-          @Override
-          public void onStorageChange(StorageEvent event) {
-            if ("tmehFoo".equals(event.getKey())) {
-              eventHandledCount[0]++;
-              if (eventHandledCount[0] == 2) {
-                finishTest();
-              }
+        event -> {
+          if ("tmehFoo".equals(event.getKey())) {
+            eventHandledCount[0]++;
+            if (eventHandledCount[0] == 2) {
+              finishTest();
             }
           }
         };
-    storage.addStorageEventHandler(handler);
+    Storage.addStorageEventHandler(handler);
 
     handler2 =
-        new StorageEvent.Handler() {
-          @Override
-          public void onStorageChange(StorageEvent event) {
-            if ("tmehFoo".equals(event.getKey())) {
-              eventHandledCount[0]++;
-              if (eventHandledCount[0] == 2) {
-                finishTest();
-              }
+        event -> {
+          if ("tmehFoo".equals(event.getKey())) {
+            eventHandledCount[0]++;
+            if (eventHandledCount[0] == 2) {
+              finishTest();
             }
           }
         };
-    storage.addStorageEventHandler(handler2);
+    Storage.addStorageEventHandler(handler2);
     storage.removeItem("tmehFoo");
   }
 
@@ -385,20 +363,17 @@ public abstract class StorageTest extends GWTTestCase {
     delayTestFinish(2000);
     storage.setItem("tesaFoo", "tesaBar");
     handler =
-        new StorageEvent.Handler() {
-          @Override
-          public void onStorageChange(StorageEvent event) {
-            Storage eventStorage = event.getStorageArea();
-            assertEquals(storage, eventStorage);
-            boolean equalsLocal = Storage.getLocalStorageIfSupported().equals(eventStorage);
-            boolean equalsSession = Storage.getSessionStorageIfSupported().equals(eventStorage);
-            // assert that storage is either local or session, but not both.
-            assertFalse(equalsLocal == equalsSession);
+        event -> {
+          Storage eventStorage = event.getStorageArea();
+          assertEquals(storage, eventStorage);
+          boolean equalsLocal = Storage.getLocalStorageIfSupported().equals(eventStorage);
+          boolean equalsSession = Storage.getSessionStorageIfSupported().equals(eventStorage);
+          // assert that storage is either local or session, but not both.
+          assertFalse(equalsLocal == equalsSession);
 
-            finishTest();
-          }
+          finishTest();
         };
-    storage.addStorageEventHandler(handler);
+    Storage.addStorageEventHandler(handler);
     storage.clear();
   }
 

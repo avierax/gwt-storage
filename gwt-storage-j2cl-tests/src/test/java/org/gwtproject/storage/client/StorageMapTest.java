@@ -20,26 +20,10 @@ import java.util.Map;
 
 /** Tests {@link StorageMap}. */
 public abstract class StorageMapTest extends MapInterfaceTest<String, String> {
-  protected Storage storage;
+  public Storage storage;
 
   public StorageMapTest() {
     super(false, false, true, true, true);
-  }
-
-  @Override
-  public String getModuleName() {
-    return "org.gwtproject.storage.StorageTest";
-  }
-
-  @Override
-  protected void gwtSetUp() throws Exception {
-    storage = getStorage();
-    if (storage == null) {
-      return; // do not run if not supported
-    }
-
-    // setup for tests by emptying storage
-    storage.clear();
   }
 
   /**
@@ -52,17 +36,17 @@ public abstract class StorageMapTest extends MapInterfaceTest<String, String> {
   abstract Storage getStorage();
 
   @Override
-  protected String getKeyNotInPopulatedMap() throws UnsupportedOperationException {
+  public String getKeyNotInPopulatedMap() throws UnsupportedOperationException {
     return "nonExistingKey";
   }
 
   @Override
-  protected String getValueNotInPopulatedMap() throws UnsupportedOperationException {
+  public String getValueNotInPopulatedMap() throws UnsupportedOperationException {
     return "nonExistingValue";
   }
 
   @Override
-  protected Map<String, String> makeEmptyMap() throws UnsupportedOperationException {
+  public Map<String, String> makeEmptyMap() throws UnsupportedOperationException {
     if (storage == null) {
       throw new UnsupportedOperationException(
           "StorageMap not supported because Storage is not supported.");
@@ -74,7 +58,7 @@ public abstract class StorageMapTest extends MapInterfaceTest<String, String> {
   }
 
   @Override
-  protected Map<String, String> makePopulatedMap() throws UnsupportedOperationException {
+  public Map<String, String> makePopulatedMap() throws UnsupportedOperationException {
     if (storage == null) {
       throw new UnsupportedOperationException(
           "StorageMap not supported because Storage is not supported.");

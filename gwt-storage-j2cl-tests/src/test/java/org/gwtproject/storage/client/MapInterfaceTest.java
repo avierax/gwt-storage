@@ -17,9 +17,8 @@
 package org.gwtproject.storage.client;
 
 import static java.util.Collections.singleton;
+import static org.junit.Assert.*;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.junit.client.GWTTestCase;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,6 +27,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import org.gwtproject.core.client.GWT;
+import org.junit.Test;
 
 /**
  * Tests representing the contract of {@link Map}. Concrete subclasses of this base class test
@@ -40,7 +41,7 @@ import java.util.Set;
  * @param <K> the type of keys used by the maps under test
  * @param <V> the type of mapped values used the maps under test
  */
-public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
+public abstract class MapInterfaceTest<K, V> {
 
   protected final boolean supportsPut;
   protected final boolean supportsRemove;
@@ -249,6 +250,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
    */
   protected void assertMoreInvariants(Map<K, V> map) {}
 
+  @Test
   public void testClear() {
     final Map<K, V> map;
     try {
@@ -271,6 +273,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testContainsKey() {
     final Map<K, V> map;
     final K unmappedKey;
@@ -294,6 +297,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testContainsValue() {
     final Map<K, V> map;
     final V unmappedValue;
@@ -317,6 +321,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testEntrySet() {
     final Map<K, V> map;
     final Set<Entry<K, V>> entrySet;
@@ -342,6 +347,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     }
   }
 
+  @Test
   public void testEntrySetForEmptyMap() {
     final Map<K, V> map;
     try {
@@ -352,6 +358,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testEntrySetContainsEntryNullKeyPresent() {
     if (!allowsNullKeys || !supportsPut) {
       return;
@@ -379,6 +386,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertFalse(entrySet.contains(mapEntry(null, null)));
   }
 
+  @Test
   public void testEntrySetContainsEntryNullKeyMissing() {
     final Map<K, V> map;
     final Set<Entry<K, V>> entrySet;
@@ -401,6 +409,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertFalse(entrySet.contains(mapEntry(null, null)));
   }
 
+  @Test
   public void testEntrySetIteratorRemove() {
     final Map<K, V> map;
     try {
@@ -436,6 +445,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testEntrySetRemove() {
     final Map<K, V> map;
     try {
@@ -461,6 +471,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testEntrySetRemoveMissingKey() {
     final Map<K, V> map;
     final K key;
@@ -489,6 +500,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testEntrySetRemoveDifferentValue() {
     final Map<K, V> map;
     try {
@@ -516,6 +528,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testEntrySetRemoveNullKeyPresent() {
     if (!allowsNullKeys || !supportsPut || !supportsRemove) {
       return;
@@ -546,6 +559,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertFalse(map.containsKey(null));
   }
 
+  @Test
   public void testEntrySetRemoveNullKeyMissing() {
     final Map<K, V> map;
     try {
@@ -571,6 +585,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testEntrySetRemoveAll() {
     final Map<K, V> map;
     try {
@@ -600,6 +615,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testEntrySetRemoveAllNullFromEmpty() {
     final Map<K, V> map;
     try {
@@ -625,6 +641,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testEntrySetRetainAll() {
     final Map<K, V> map;
     try {
@@ -654,6 +671,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testEntrySetRetainAllNullFromEmpty() {
     final Map<K, V> map;
     try {
@@ -679,6 +697,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testEntrySetClear() {
     final Map<K, V> map;
     try {
@@ -701,6 +720,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testEntrySetAddAndAddAll() {
     final Map<K, V> map;
     try {
@@ -726,6 +746,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testEntrySetSetValue() {
     // TODO: Investigate the extent to which, in practice, maps that support
     // put() also support Entry.setValue().
@@ -752,6 +773,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testEntrySetSetValueSameValue() {
     // TODO: Investigate the extent to which, in practice, maps that support
     // put() also support Entry.setValue().
@@ -776,6 +798,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testEqualsForEqualMap() {
     final Map<K, V> map;
     try {
@@ -795,6 +818,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
    * equals does not apply to Storage because there's only one instance so two
    * maps will always be equal.
    */
+  @Test
   public void disabled_testEqualsForLargerMap() {
     if (!supportsPut) {
       return;
@@ -817,6 +841,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
    * equals does not apply to Storage because there's only one instance so two
    * maps will always be equal.
    */
+  @Test
   public void disabled_testEqualsForSmallerMap() {
     if (!supportsRemove) {
       return;
@@ -851,6 +876,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertFalse(map.equals(null));
   }
 
+  @Test
   public void testGet() {
     final Map<K, V> map;
     try {
@@ -872,6 +898,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertNull(map.get(unmappedKey));
   }
 
+  @Test
   public void testGetForEmptyMap() {
     final Map<K, V> map;
     K unmappedKey = null;
@@ -884,6 +911,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertNull(map.get(unmappedKey));
   }
 
+  @Test
   public void testGetNull() {
     final Map<K, V> map;
     try {
@@ -907,6 +935,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testHashCode() {
     final Map<K, V> map;
     try {
@@ -917,6 +946,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testHashCodeForEmptyMap() {
     final Map<K, V> map;
     try {
@@ -927,6 +957,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testPutNewKey() {
     final Map<K, V> map;
     try {
@@ -962,6 +993,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testPutExistingKey() {
     final Map<K, V> map;
     final K keyToPut;
@@ -991,6 +1023,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testPutNullKey() {
     if (!supportsPut) {
       return;
@@ -1025,6 +1058,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testPutNullValue() {
     if (!supportsPut) {
       return;
@@ -1060,6 +1094,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testPutNullValueForExistingKey() {
     if (!supportsPut) {
       return;
@@ -1091,6 +1126,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testPutAllNewKey() {
     final Map<K, V> map;
     try {
@@ -1124,6 +1160,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testPutAllExistingKey() {
     final Map<K, V> map;
     final K keyToPut;
@@ -1153,6 +1190,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testRemove() {
     final Map<K, V> map;
     final K keyToRemove;
@@ -1180,6 +1218,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testRemoveMissingKey() {
     final Map<K, V> map;
     final K keyToRemove;
@@ -1204,6 +1243,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testSize() {
     final Map<K, V> map;
     try {
@@ -1214,6 +1254,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testKeySetClear() {
     final Map<K, V> map;
     try {
@@ -1236,6 +1277,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testKeySetRemoveAllNullFromEmpty() {
     final Map<K, V> map;
     try {
@@ -1261,6 +1303,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testKeySetRetainAllNullFromEmpty() {
     final Map<K, V> map;
     try {
@@ -1286,6 +1329,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testValues() {
     final Map<K, V> map;
     final Collection<V> valueCollection;
@@ -1308,6 +1352,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     }
   }
 
+  @Test
   public void testValuesIteratorRemove() {
     final Map<K, V> map;
     try {
@@ -1345,6 +1390,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testValuesRemove() {
     final Map<K, V> map;
     try {
@@ -1372,6 +1418,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testValuesRemoveMissing() {
     final Map<K, V> map;
     final V valueToRemove;
@@ -1397,6 +1444,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testValuesRemoveAll() {
     final Map<K, V> map;
     try {
@@ -1425,6 +1473,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testValuesRemoveAllNullFromEmpty() {
     final Map<K, V> map;
     try {
@@ -1450,6 +1499,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testValuesRetainAll() {
     final Map<K, V> map;
     try {
@@ -1479,6 +1529,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testValuesRetainAllNullFromEmpty() {
     final Map<K, V> map;
     try {
@@ -1504,6 +1555,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
     assertInvariants(map);
   }
 
+  @Test
   public void testValuesClear() {
     final Map<K, V> map;
     try {
@@ -1528,8 +1580,7 @@ public abstract class MapInterfaceTest<K, V> extends GWTTestCase {
   }
 
   private void failForMissingNPE(Map<K, V> map) {
-    if (map.isEmpty() && !GWT.isScript() && TestUtils.getJdkVersion() < 8) {
-      // JDK < 8 does not conform to the specification if the map is empty.
+    if (map.isEmpty() && !GWT.isScript()) {
       return;
     }
     fail("Should have thrown NullPointerException");
