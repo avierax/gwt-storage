@@ -18,8 +18,8 @@ package org.gwtproject.storage.client;
 
 import static elemental2.dom.DomGlobal.window;
 
+import elemental2.webstorage.StorageEventInit;
 import elemental2.webstorage.WebStorageWindow;
-import jsinterop.base.JsPropertyMap;
 
 /**
  * Implementation of Storage with non-native events.
@@ -31,13 +31,12 @@ class StorageImplNonNativeEvents extends StorageImpl {
 
   private static StorageEvent createStorageEvent(
       String key, String oldValue, String newValue, String storageName) {
-    JsPropertyMap<Object> init = JsPropertyMap.of();
-    init.set("key", key);
-    init.set("oldValue", oldValue);
-    init.set("newValue", newValue);
-    init.set("url", window.location.href);
-    init.set(
-        "storageArea",
+    StorageEventInit init = StorageEventInit.create();
+    init.setKey(key);
+    init.setOldValue(oldValue);
+    init.setNewValue(newValue);
+    init.setUrl(window.location.href);
+    init.setStorageArea(
         "localStorage".equals(storageName)
             ? WebStorageWindow.of(window).localStorage
             : WebStorageWindow.of(window).sessionStorage);
