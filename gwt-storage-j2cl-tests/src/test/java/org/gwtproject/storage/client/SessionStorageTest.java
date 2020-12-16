@@ -21,7 +21,7 @@ import com.google.j2cl.junit.apt.J2clTestInput;
 @J2clTestInput(SessionStorageTest.class)
 public class SessionStorageTest extends StorageTest {
   @Override
-  Storage getStorage() {
+  public Storage getStorage() {
     return Storage.getSessionStorageIfSupported();
   }
 }

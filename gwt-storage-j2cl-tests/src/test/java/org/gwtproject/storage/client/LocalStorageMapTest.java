@@ -18,10 +18,10 @@ package org.gwtproject.storage.client;
 import com.google.j2cl.junit.apt.J2clTestInput;
 
 /** Tests Local {@link StorageMap}. */
-@J2clTestInput(SessionStorageMapTest.class)
+@J2clTestInput(LocalStorageMapTest.class)
 public class LocalStorageMapTest extends StorageMapTest {
   @Override
-  Storage getStorage() {
+  public Storage getStorage() {
     return Storage.getLocalStorageIfSupported();
   }
 }

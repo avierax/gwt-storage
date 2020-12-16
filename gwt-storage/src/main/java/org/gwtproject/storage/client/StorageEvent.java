@@ -16,6 +16,7 @@
 
 package org.gwtproject.storage.client;
 
+import elemental2.webstorage.StorageEventInit;
 import jsinterop.annotations.JsConstructor;
 import jsinterop.annotations.JsOverlay;
 import jsinterop.annotations.JsPackage;
@@ -64,7 +65,7 @@ public final class StorageEvent {
   }
 
   @JsConstructor
-  private StorageEvent(String type, Object init) {}
+  private StorageEvent(String type, StorageEventInit init) {}
 
   /**
    * Returns a newly created and correctly initialized event.
@@ -77,7 +78,7 @@ public final class StorageEvent {
    * @return the newly created event object
    */
   @JsOverlay
-  static StorageEvent createEvent(Object init) {
+  static StorageEvent createEvent(StorageEventInit init) {
     final StorageEvent storageEvent = new StorageEvent("storage", init);
     final JsPropertyMap<Object> se = Js.cast(storageEvent);
     final JsPropertyMap<Object> initSe = Js.cast(init);

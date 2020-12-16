@@ -15,30 +15,24 @@
  */
 package org.gwtproject.storage.client;
 
+import static org.junit.Assert.*;
+
+import elemental2.promise.Promise;
+import org.gwtproject.core.client.GWT;
 import org.gwtproject.event.shared.HandlerRegistration;
+import org.gwtproject.timer.client.Timer;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /** Tests {@link Storage}. */
 public abstract class StorageTest {
-  protected Storage storage;
-  protected StorageEvent.Handler handler;
-  protected StorageEvent.Handler handler2;
+  public Storage storage;
+  public StorageEvent.Handler handler;
+  public StorageEvent.Handler handler2;
 
-  private native boolean isFirefox35OrLater() /*-{
-    var geckoVersion = @com.google.gwt.dom.client.DOMImplMozilla::getGeckoVersion()();
-    return (geckoVersion != -1) && (geckoVersion >= 1009001);
-  }-*/;
-
-  private native boolean isSafari3OrBefore() /*-{
-    return @com.google.gwt.dom.client.DOMImplWebkit::isWebkit525OrBefore()();
-  }-*/;
-
-  @Override
-  public String getModuleName() {
-    return "org.gwtproject.storage.Storage";
-  }
-
-  @Override
-  protected void gwtSetUp() throws Exception {
+  @Before
+  public void setUp() {
     storage = getStorage();
     if (storage == null) {
       return; // do not run if not supported
@@ -46,11 +40,11 @@ public abstract class StorageTest {
 
     // setup for tests by removing event handler
     if (handler != null) {
-      storage.removeStorageEventHandler(handler);
+      Storage.removeStorageEventHandler(handler);
       handler = null;
     }
     if (handler2 != null) {
-      storage.removeStorageEventHandler(handler2);
+      Storage.removeStorageEventHandler(handler2);
       handler2 = null;
     }
 
@@ -58,19 +52,19 @@ public abstract class StorageTest {
     storage.clear();
   }
 
-  @Override
-  protected void gwtTearDown() throws Exception {
+  @After
+  public void tearDown() {
     if (storage == null) {
       return; // do not run if not supported
     }
 
     // clean up by removing event handler
     if (handler != null) {
-      storage.removeStorageEventHandler(handler);
+      Storage.removeStorageEventHandler(handler);
       handler = null;
     }
     if (handler2 != null) {
-      storage.removeStorageEventHandler(handler2);
+      Storage.removeStorageEventHandler(handler2);
       handler2 = null;
     }
 
@@ -87,6 +81,7 @@ public abstract class StorageTest {
    */
   abstract Storage getStorage();
 
+  @Test
   public void testClear() {
     if (storage == null) {
       return; // do not run if not supported
@@ -98,6 +93,7 @@ public abstract class StorageTest {
     assertEquals(0, storage.getLength());
   }
 
+  @Test
   public void testGet() {
     if (storage == null) {
       return; // do not run if not supported
@@ -114,6 +110,7 @@ public abstract class StorageTest {
         storage.getItem("notset"));
   }
 
+  @Test
   public void testLength() {
     if (storage == null) {
       return; // do not run if not supported
@@ -129,12 +126,13 @@ public abstract class StorageTest {
     assertEquals(0, storage.getLength());
   }
 
+  @Test
   public void testSet() {
     if (storage == null) {
       return; // do not run if not supported
     }
 
-    assertEquals(null, storage.getItem("foo"));
+    assertNull(storage.getItem("foo"));
     assertEquals(0, storage.getLength());
     storage.setItem("foo", "bar1");
     assertEquals("bar1", storage.getItem("foo"));
@@ -154,15 +152,16 @@ public abstract class StorageTest {
     }
   }
 
+  @Test
   public void testKey() {
     if (storage == null) {
       return; // do not run if not supported
     }
 
     // key(n) where n >= storage.length() should return null
-    assertEquals(null, storage.key(0));
+    assertNull(storage.key(0));
     storage.setItem("a", "b");
-    assertEquals(null, storage.key(1));
+    assertNull(storage.key(1));
     storage.clear();
 
     storage.setItem("foo1", "bar");
@@ -176,6 +175,7 @@ public abstract class StorageTest {
     assertTrue(storage.key(0).equals("foo2") || storage.key(1).equals("foo2"));
   }
 
+  @Test
   public void testRemoveItem() {
     if (storage == null) {
       return; // do not run if not supported
@@ -193,225 +193,175 @@ public abstract class StorageTest {
 
     // removing a key should remove that key and value
     storage.removeItem("foo1");
-    assertEquals(null, storage.getItem("foo1"));
+    assertNull(storage.getItem("foo1"));
     assertEquals("bar2", storage.getItem("foo2"));
     storage.removeItem("foo2");
-    assertEquals(null, storage.getItem("foo2"));
+    assertNull(storage.getItem("foo2"));
   }
 
-  public void testClearStorageEvent() {
-    if (storage == null) {
-      return; // do not run if not supported
-    }
+  @Test(timeout = 2000)
+  public Promise<Void> testClearStorageEvent() {
+    return new Promise<>(
+        (resolve, reject) -> {
+          storage.setItem("tcseFoo", "tcseBar");
+          handler =
+              event -> {
+                assertNull(event.getKey());
+                assertNull(event.getOldValue());
+                assertNull(event.getNewValue());
+                assertEquals(storage, event.getStorageArea());
+                assertNotNull(event.getUrl());
 
-    delayTestFinish(2000);
-    storage.setItem("tcseFoo", "tcseBar");
-    handler =
-        new StorageEvent.Handler() {
-          @Override
-          public void onStorageChange(StorageEvent event) {
-            assertNull(event.getKey());
-            assertNull(event.getOldValue());
-            assertNull(event.getNewValue());
-            assertEquals(storage, event.getStorageArea());
-            assertNotNull(event.getUrl());
-
-            finishTest();
-          }
-        };
-    storage.addStorageEventHandler(handler);
-    storage.clear();
+                resolve.onInvoke((Void) null);
+              };
+          Storage.addStorageEventHandler(handler);
+          storage.clear();
+        });
   }
 
-  public void testSetItemStorageEvent() {
-    if (storage == null) {
-      return; // do not run if not supported
-    }
+  @Test(timeout = 2000)
+  public Promise<Void> testSetItemStorageEvent() {
+    return new Promise<>(
+        (resolve, reject) -> {
+          storage.setItem("tsiseFoo", "tsiseBarOld");
 
-    delayTestFinish(2000);
-    storage.setItem("tsiseFoo", "tsiseBarOld");
+          handler =
+              event -> {
+                assertEquals("tsiseFoo", event.getKey());
+                assertEquals("tsiseBarNew", event.getNewValue());
+                assertEquals("tsiseBarOld", event.getOldValue());
+                assertEquals(storage, event.getStorageArea());
+                assertNotNull(event.getUrl());
 
-    handler =
-        new StorageEvent.Handler() {
-          @Override
-          public void onStorageChange(StorageEvent event) {
-            assertEquals("tsiseFoo", event.getKey());
-            assertEquals("tsiseBarNew", event.getNewValue());
-            assertEquals("tsiseBarOld", event.getOldValue());
-            assertEquals(storage, event.getStorageArea());
-            assertNotNull(event.getUrl());
-
-            finishTest();
-          }
-        };
-    storage.addStorageEventHandler(handler);
-    storage.setItem("tsiseFoo", "tsiseBarNew");
+                resolve.onInvoke((Void) null);
+              };
+          Storage.addStorageEventHandler(handler);
+          storage.setItem("tsiseFoo", "tsiseBarNew");
+        });
   }
 
-  public void testRemoveItemStorageEvent() {
-    if (storage == null) {
-      return; // do not run if not supported
-    }
+  @Test(timeout = 2000)
+  public Promise<Void> testRemoveItemStorageEvent() {
+    return new Promise<>(
+        (resolve, reject) -> {
+          storage.setItem("triseFoo", "triseBarOld");
 
-    delayTestFinish(2000);
-    storage.setItem("triseFoo", "triseBarOld");
-
-    handler =
-        new StorageEvent.Handler() {
-          @Override
-          public void onStorageChange(StorageEvent event) {
-            assertEquals("triseFoo", event.getKey());
-            finishTest();
-          }
-        };
-    storage.addStorageEventHandler(handler);
-    storage.removeItem("triseFoo");
+          handler =
+              event -> {
+                assertEquals("triseFoo", event.getKey());
+                resolve.onInvoke((Void) null);
+              };
+          Storage.addStorageEventHandler(handler);
+          storage.removeItem("triseFoo");
+        });
   }
 
-  public void testHandlerRegistration() {
-    if (storage == null) {
-      return; // do not run if not supported
-    }
+  @Test(timeout = 3000)
+  public Promise<Void> testHandlerRegistration() {
+    return new Promise<>(
+        (resolve, reject) -> {
+          final boolean[] eventFired = new boolean[1];
 
-    final boolean[] eventFired = new boolean[1];
-    eventFired[0] = false;
+          handler =
+              event -> {
+                fail("Storage change should not have fired.");
+                eventFired[0] = true;
+                resolve.onInvoke((Void) null);
+              };
+          HandlerRegistration registration = Storage.addStorageEventHandler(handler);
+          registration.removeHandler();
 
-    delayTestFinish(3000);
+          // these should fire events, but they should not be caught by handler
+          storage.setItem("thrFoo", "thrBar");
+          storage.clear();
 
-    handler =
-        new StorageEvent.Handler() {
-          @Override
-          public void onStorageChange(StorageEvent event) {
-            fail("Storage change should not have fired.");
-            eventFired[0] = true;
-            finishTest();
-          }
-        };
-    HandlerRegistration registration = storage.addStorageEventHandler(handler);
-    registration.removeHandler();
-
-    // these should fire events, but they should not be caught by handler
-    storage.setItem("thrFoo", "thrBar");
-    storage.clear();
-
-    // schedule timer to make sure event didn't fire async
-    new Timer() {
-      @Override
-      public void run() {
-        if (!eventFired[0]) {
-          finishTest();
-        }
-      }
-    }.schedule(1000);
-  }
-
-  public void testEventInEvent() {
-    if (storage == null) {
-      return; // do not run if not supported
-    }
-
-    delayTestFinish(3000);
-    storage.setItem("teieFoo", "teieBar");
-
-    handler =
-        new StorageEvent.Handler() {
-          @Override
-          public void onStorageChange(StorageEvent event) {
-            if ("teieFoo".equals(event.getKey())) {
-              storage.clear();
-              storage.setItem("teieFoo2", "teieBar2");
-              // firing events from within a handler should not corrupt the values.
-              assertEquals("teieFoo", event.getKey());
-              storage.setItem("teieFooEndTest", "thanks");
-            }
-            if ("teieFooEndTest".equals(event.getKey())) {
-              finishTest();
-            }
-          }
-        };
-    storage.addStorageEventHandler(handler);
-    storage.removeItem("teieFoo");
-  }
-
-  public void testMultipleEventHandlers() {
-    if (storage == null) {
-      return; // do not run if not supported
-    }
-
-    delayTestFinish(3000);
-
-    final int[] eventHandledCount = new int[] {0};
-
-    storage.setItem("tmehFoo", "tmehBar");
-
-    handler =
-        new StorageEvent.Handler() {
-          @Override
-          public void onStorageChange(StorageEvent event) {
-            if ("tmehFoo".equals(event.getKey())) {
-              eventHandledCount[0]++;
-              if (eventHandledCount[0] == 2) {
-                finishTest();
+          // schedule timer to make sure event didn't fire async
+          new Timer() {
+            @Override
+            public void run() {
+              if (!eventFired[0]) {
+                resolve.onInvoke((Void) null);
               }
             }
-          }
-        };
-    storage.addStorageEventHandler(handler);
-
-    handler2 =
-        new StorageEvent.Handler() {
-          @Override
-          public void onStorageChange(StorageEvent event) {
-            if ("tmehFoo".equals(event.getKey())) {
-              eventHandledCount[0]++;
-              if (eventHandledCount[0] == 2) {
-                finishTest();
-              }
-            }
-          }
-        };
-    storage.addStorageEventHandler(handler2);
-    storage.removeItem("tmehFoo");
+          }.schedule(1000);
+        });
   }
 
-  public void testEventStorageArea() {
-    if (storage == null) {
-      return; // do not run if not supported
-    }
+  @Test(timeout = 3000)
+  public Promise<Void> testEventInEvent() {
+    return new Promise<>(
+        (resolve, reject) -> {
+          storage.setItem("teieFoo", "teieBar");
 
-    delayTestFinish(2000);
-    storage.setItem("tesaFoo", "tesaBar");
-    handler =
-        new StorageEvent.Handler() {
-          @Override
-          public void onStorageChange(StorageEvent event) {
-            Storage eventStorage = event.getStorageArea();
-            assertEquals(storage, eventStorage);
-            boolean equalsLocal = Storage.getLocalStorageIfSupported().equals(eventStorage);
-            boolean equalsSession = Storage.getSessionStorageIfSupported().equals(eventStorage);
-            // assert that storage is either local or session, but not both.
-            assertFalse(equalsLocal == equalsSession);
-
-            finishTest();
-          }
-        };
-    storage.addStorageEventHandler(handler);
-    storage.clear();
+          handler =
+              event -> {
+                if ("teieFoo".equals(event.getKey())) {
+                  storage.clear();
+                  storage.setItem("teieFoo2", "teieBar2");
+                  // firing events from within a handler should not corrupt the values.
+                  assertEquals("teieFoo", event.getKey());
+                  storage.setItem("teieFooEndTest", "thanks");
+                }
+                if ("teieFooEndTest".equals(event.getKey())) {
+                  resolve.onInvoke((Void) null);
+                }
+              };
+          Storage.addStorageEventHandler(handler);
+          storage.removeItem("teieFoo");
+        });
   }
 
-  public void testSupported() {
-    // test the isxxxSupported() call
-    if (isFirefox35OrLater()) {
-      assertNotNull(storage);
-      assertTrue(Storage.isLocalStorageSupported());
-      assertTrue(Storage.isSessionStorageSupported());
-      assertTrue(Storage.isSupported());
-    }
-    if (isSafari3OrBefore()) {
-      assertNull(storage);
-      assertFalse(Storage.isLocalStorageSupported());
-      assertFalse(Storage.isSessionStorageSupported());
-      assertFalse(Storage.isSupported());
-    }
+  @Test(timeout = 3000)
+  public Promise<Void> testMultipleEventHandlers() {
+    return new Promise<>(
+        (resolve, reject) -> {
+          final int[] eventHandledCount = new int[] {0};
+
+          storage.setItem("tmehFoo", "tmehBar");
+
+          handler =
+              event -> {
+                if ("tmehFoo".equals(event.getKey())) {
+                  eventHandledCount[0]++;
+                  if (eventHandledCount[0] == 2) {
+                    resolve.onInvoke((Void) null);
+                  }
+                }
+              };
+          Storage.addStorageEventHandler(handler);
+
+          handler2 =
+              event -> {
+                if ("tmehFoo".equals(event.getKey())) {
+                  eventHandledCount[0]++;
+                  if (eventHandledCount[0] == 2) {
+                    resolve.onInvoke((Void) null);
+                  }
+                }
+              };
+          Storage.addStorageEventHandler(handler2);
+          storage.removeItem("tmehFoo");
+        });
+  }
+
+  @Test(timeout = 2000)
+  public Promise<Void> testEventStorageArea() {
+    return new Promise<>(
+        (resolve, reject) -> {
+          storage.setItem("tesaFoo", "tesaBar");
+          handler =
+              event -> {
+                Storage eventStorage = event.getStorageArea();
+                assertEquals(storage, eventStorage);
+                boolean equalsLocal = Storage.getLocalStorageIfSupported().equals(eventStorage);
+                boolean equalsSession = Storage.getSessionStorageIfSupported().equals(eventStorage);
+                // assert that storage is either local or session, but not both.
+                assertNotEquals(equalsLocal, equalsSession);
+
+                resolve.onInvoke((Void) null);
+              };
+          Storage.addStorageEventHandler(handler);
+          storage.clear();
+        });
   }
 }
